@@ -1,0 +1,34 @@
+﻿<!--This HTML is used in the render function to build the elements within the plugin. The render function first creates a
+Dijit ContentPane to hold all the elements. The ContentPane is assigned a dynamic id upon creation. The render function
+takes the ContentPane id and prepends it to every element with a declared id in this HTML before the elements are created.
+The unique ContentPane id makes all the element ids unique and prevents duplicate id errors across other apps.-->
+<div id="top-wrap" class="mr-top-wrap">
+	<h3>Explore Restoration Scores By:</h3>
+	<div id="ebOptDiv" class="toggle-btn ebOptDiv">
+		<input type="radio" id="ebOpt1" name="ebOpt" value="geography"/>
+		<label for="ebOpt1">Geography</label>
+		<input type="radio" id="ebOpt2" name="ebOpt" value="typology"/>
+		<label for="ebOpt2">Typology</label>
+	</div>
+	<div id="geography" class="mr-section-wrap geography">
+		<div class="chosen-wrap" style="margin-bottom:16px;">
+			<select data-placeholder="Choose a Geography to Explore" id="chooseGeography" class="chosen">
+			</select>
+		</div>
+		<div>
+			<div class="geoNum">
+				<div>Total Restorable Area:</div><div><span id="-Tot_Restor">300,000</span> ha</div>
+			</div>	
+			<div class="geoNum">
+				<div>From Loss:</div><div><span id="-Tot_Restor">280,000</span> ha</div>
+			</div>
+			<div class="geoNum">
+				<div>From Degradation:</div><div><span id="-Tot_Restor">20,000</span> ha</div>
+			</div>	
+		</div>	
+	</div>
+	<div id="typology" class="mr-section-wrap">
+
+	</div>	
+</div>	
+

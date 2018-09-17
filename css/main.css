@@ -1,0 +1,18 @@
+.ebOptDiv{
+	
+}
+.mr-section-wrap{
+	
+}
+.geography{
+	padding-top:20px;
+}
+.geoNum{
+	font-size:14px; color:#438c9d; display:flex;margin-left:10px;
+}
+.geoNum div{
+	flex:1;
+}
+.geoNum span{
+	font-weight:bold; font-size:16px;
+}
