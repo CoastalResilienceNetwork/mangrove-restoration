@@ -1,3 +1,7 @@
+// // Pull in your favorite version of jquery 
+require({ 
+	packages: [{ name: "jquery", location: "http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/", main: "jquery.min" }] 
+});
 // Bring in dojo and javascript api classes as well as varObject.json, js files, and content.html
 define([
 	"dojo/_base/declare", "framework/PluginBase", "dijit/layout/ContentPane", "dojo/dom", "dojo/dom-style", "dojo/dom-geometry", "dojo/text!./obj.json", 
@@ -7,7 +11,7 @@ function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, conte
 	return declare(PluginBase, {
 		// The height and width are set here when an infographic is defined. When the user click Continue it rebuilds the app window with whatever you put in.
 		toolbarName:"Mangrove Restoration", showServiceLayersInLegend:false, allowIdentifyWhenActive:false, rendered:false, resizable:false,
-		hasCustomPrint:false, size:'custom', width:"425", hasHelp:false, fullName:"Mangrove Restoration",
+		hasCustomPrint:false, size:'custom', width:"350", hasHelp:false, fullName:"Mangrove Restoration",
 		
 		// First function called when the user clicks the pluging icon. 
 		initialize: function (frameworkParameters) {
@@ -86,6 +90,7 @@ function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, conte
 			$('#' + this.id).html(idUpdate);
 			// Click listeners
 			this.clicks.eventListeners(this);
+			this.clicks.buildPieChart(this);
 			// Create ESRI objects and event listeners	
 			this.esriapi.esriApiFunctions(this);
 			this.rendered = true;	

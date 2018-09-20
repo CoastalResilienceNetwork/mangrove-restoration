@@ -25,7 +25,34 @@ The unique ContentPane id makes all the element ids unique and prevents duplicat
 			<div class="geoNum">
 				<div>From Degradation:</div><div><span id="-Tot_Restor">20,000</span> ha</div>
 			</div>	
-		</div>	
+		</div>
+		<div style="display:flex; justify-content:center; margin-top:12px;">
+			<div style="color:#438c9d; font-size:16px; text-align:center; margin-top:15px;">Mean<br>Restoration<br>Score</div>
+			<div id="pie1"><svg class="pie1" width="100" height="100"></svg></div>	
+		</div>
+		<button id="pie1Up">change</button>	
+		<h4>Ecosystem Service Values For Restored Lost Mangroves</h4>
+		<div>
+			<div class="geoNum">
+				<div>Blue Carbon</div><div><span id="-SOC">100,000</span> Mg</div>
+			</div>
+			<div class="geoNum">	
+				<div>People Protected</div><div><span id="-People">10,000</span></div>
+			</div>
+			<div class="geoNum">	
+				<div>Built Capital Protected</div><div>$<span id="-Capital">1,000</span></div>
+			</div>
+			<div class="geoNum">	
+				<div>Fisheries Catch Score</div><div><span id="-Fish_Score">500</span></div>
+			</div>
+			<div class="geoNum">	
+				<div>Aboveground Biomass</div><div><span id="-AGB">500</span> tonnes</div>
+			</div>
+		</div>
+		<label class="form-component" for="t3res1">
+			<input type="checkbox" id="t3res1" name="t3res">
+			<div class="check"></div><span class="form-text">Select Top 3 Restorable Areas</span>
+		</label>	
 	</div>
 	<div id="typology" class="mr-section-wrap">
 
