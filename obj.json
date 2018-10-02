@@ -1,5 +1,6 @@
 {
-	"visibleLayers": ["1","4"],
+	"visibleLayers": ["1"],
 	"ebOpt": "geography",
+	"country": "",
 	"extent": ["test"]
 }

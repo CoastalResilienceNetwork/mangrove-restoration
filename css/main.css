@@ -2,20 +2,52 @@
 	
 }
 .mr-section-wrap{
-	
+	display:none;
+}
+.geoStatsWrap, .typeStatsWrap{
+	display:none;
 }
 .geography{
 	padding-top:4px;
 }
+.geoNumWrap{
+	display:flex; flex-wrap:wrap;
+}
 .geoNum{
-	font-size:14px; color:#438c9d; display:flex; margin-left:10px;
+	font-size: 13px;
+    color: #438c9d;
+    flex:1;
+    margin-left: 10px;
+    margin-top: 10px;
+    min-width: 100px;
+    box-shadow: 0 1px 1px rgba(16,22,26,.2);
+    border: 1pt solid #ddd;
+    padding: 2px 0 2px 4px;
 }
 .geoNum div{
 	flex:1;
 }
+.geoNum div:first-of-type{
+	color:#5d6165;
+}	
 .geoNum span, .geoNum1 span{
-	font-weight:bold; font-size:16px;
+	font-weight:bold; font-size:15px; text-align:right;
 }
 .geoNum1{
 	font-size:14px; color:#438c9d; margin-left:10px;
+}
+.ref-wrap span{
+	margin-left:5px;
+}
+.bar { 
+	fill: #0096d6; 
+}
+.tick text{
+	margin-right:10px;
+}
+/*.domain{
+	display:none;
+}*/
+.tick line{
+	stroke:#fff;
 }

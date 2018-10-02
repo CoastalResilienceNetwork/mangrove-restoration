@@ -11,31 +11,35 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
         return declare(null, {
 			esriApiFunctions: function(t){	
 				// Add dynamic map service
-				t.dynamicLayer = new ArcGISDynamicMapServiceLayer(t.url, {opacity:1});
+				t.dynamicLayer = new ArcGISDynamicMapServiceLayer(t.url, {opacity:0.6});
 				t.map.addLayer(t.dynamicLayer);
-				t.dynamicLayer.setVisibleLayers([-1]);
+				t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers);
 				t.dynamicLayer.on("load", function () { 			
 					t.layersArray = t.dynamicLayer.layerInfos;
 					// Query all features 
 					var q = new Query();
-					var qt = new QueryTask(t.url + "/" + t.jurisdictions );
+					var qt = new QueryTask(t.url + "/" + t.geography );
 					q.where = "OBJECTID > -1";
-					q.returnGeometry =false;
+					q.returnGeometry = false;
 					q.outFields = ["*"];
 					t.atts = [];
 					qt.execute(q, function(e){
 						t.features = e.features;
 						$("#" + t.id + "chooseGeography").append("<option></option>")
+						var cntry = [];
 						$.each(e.features,function(i,v){
-							var c =v.attributes.CNTRY_NAME;
+							t.atts.push(v.attributes)
+							var c = v.attributes.CNTRY_NAME;
 							if (c != "Global"){
-								$("#" + t.id + "chooseGeography").append("<option value='"+c+"'>"+c+"</option>")
+								cntry.push(c)
 							}
-						})			
+						})		
+						var cs = cntry.sort();
+						$.each(cs,function(i,v){
+							$("#" + t.id + "chooseGeography").append("<option value='"+v+"'>"+v+"</option>")	
+						})
 						$("#" + t.id + "chooseGeography").trigger("chosen:updated");
 					});	
-
-
 
 					$("#" + t.id + "ebOptDiv input[value='" + t.obj.ebOpt + "']").trigger("click");
 					// Save and Share Handler					
@@ -47,10 +51,11 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 					}	
 				});
 				t.sym1  = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([88,116,215,1]), 1), new Color([88,116,215]);
-				t.sym2  = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([44,123,182]), 1), new Color([44,123,182]);
+				t.sym2  = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([168,0,132]), 1), new Color([168,0,132]);
 
-				
-				t.map.setMapCursor("pointer");
+				t.map.on("extent-change",function(){
+					t.map.setMapCursor("pointer");
+				})
 			},
 			clearAtts: function(t){
 				t.map.graphics.clear();

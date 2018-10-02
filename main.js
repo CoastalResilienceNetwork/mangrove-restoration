@@ -10,8 +10,8 @@ define([
 function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, content, esriapi, clicks, lang, Query, QueryTask ) {
 	return declare(PluginBase, {
 		// The height and width are set here when an infographic is defined. When the user click Continue it rebuilds the app window with whatever you put in.
-		toolbarName:"Mangrove Restoration", showServiceLayersInLegend:false, allowIdentifyWhenActive:false, rendered:false, resizable:false,
-		hasCustomPrint:false, size:'custom', width:"350", hasHelp:false, fullName:"Mangrove Restoration",
+		toolbarName:"Mangrove Restoration", showServiceLayersInLegend:true, allowIdentifyWhenActive:false, rendered:false, resizable:false,
+		hasCustomPrint:false, size:'custom', width:"450", hasHelp:false, fullName:"Mangrove Restoration",
 		
 		// First function called when the user clicks the pluging icon. 
 		initialize: function (frameworkParameters) {
@@ -90,7 +90,8 @@ function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, conte
 			$('#' + this.id).html(idUpdate);
 			// Click listeners
 			this.clicks.eventListeners(this);
-			this.clicks.buildPieChart(this);
+			this.clicks.geographySetup(this);
+			this.clicks.typologySetup(this);
 			// Create ESRI objects and event listeners	
 			this.esriapi.esriApiFunctions(this);
 			this.rendered = true;	

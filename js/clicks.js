@@ -13,178 +13,389 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 
         return declare(null, {
 			eventListeners: function(t){
-				t.jurisdictions = 2;
-				$("#" + t.id + "chooseGeography").chosen({allow_single_deselect:false, width:"98%"})
-					.change(function(c){
-						var v = c.target.value;
-						console.log(v)
-					});
-
+				// global variables
+				t.p = 0.55;
+				t.p1 = 0.55;
+				t.geography = 2;
+				t.typology = 0;
+				// switch between geography and typology 	
 				$("#" + t.id + "ebOptDiv input").click(function(c){
 					var v = c.currentTarget.value;
 					$(".mr-section-wrap").hide();
 					$("#" + t.id + v).show();
+					t.obj.ebOpt = v;
+					t.map.graphics.clear();
+					$("#" + t.id + "chooseGeography").val("").trigger("chosen:updated").change();
+					$(".typeStatsWrap").slideUp();
+					t.map.setMapCursor("pointer");
 				})	
-			},
-			buildPieChart: function(t){
-				var tau = 2 * Math.PI; // http://tauday.com/tau-manifesto
+				// reference layer clicks
+				$("#" + t.id + "ref-wrap input").click(function(c){
+					var ln = c.currentTarget.value;
+					if (c.currentTarget.checked){
+						t.obj.visibleLayers.push(ln);	
+					}else{
+						var index = t.obj.visibleLayers.indexOf(ln);
+						if (index > -1){
+							t.obj.visibleLayers.splice(index, 1);
+						}
+					}
+					
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 
-				// An arc function with all values bound except the endAngle. So, to compute an
-				// SVG path string for a given angle, we pass an object with an endAngle
-				// property to the `arc` function, and it will return the corresponding string.
+				})
+			},
+			geographySetup: function(t){
+				// build  geography pie chart
+				var tau = 2 * Math.PI;
 				var arc = d3.arc()
 				    .innerRadius(25)
 				    .outerRadius(40)
 				    .startAngle(0);
-
-				// Get the SVG container, and apply a transform such that the origin is the
-				// center of the canvas. This way, we don’t need to position arcs individually.
 				var svg = d3.select(".pie1"),
 				    width = +svg.attr("width"),
 				    height = +svg.attr("height"),
 				    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");	
-				
 				g.append("text")
 				 	.attr("text-anchor", "middle")
 				 	.attr('font-size', '16px')
+				 	.attr('font-weight', 'bold')
+				 	.attr('fill', '#438c9d')
 				 	.attr('y', 5)
 				 	.text("15%");
-
-				// Add the background arc, from 0 to 100% (tau).
 				var background = g.append("path")
 				    .datum({endAngle: tau})
 				    .style("fill", "#ddd")
 				    .attr("d", arc);
-
-				// Add the foreground arc in orange, currently showing 12.7%.
 				var foreground = g.append("path")
 				    .datum({endAngle: 0.15 * tau})
 				    .style("fill", "#558139")
 				    .attr("d", arc);
-				console.log(0.127 * tau)
-				// Every so often, start a transition to a new random angle. The attrTween
-				// definition is encapsulated in a separate function (a closure) below.
-				t.p = 0.55;
-				$("#" + t.id + "pie1Up").click(function(){
+				function startTransition(){ 
 				   foreground.transition()
 				      .duration(750)
 				      .attrTween("d", arcTween(t.p*tau))
-				});
-
-				// Returns a tween for a transition’s "d" attribute, transitioning any selected
-				// arcs from their current angle to the specified new angle.
+				}      
 				function arcTween(newAngle) {
-					console.log(newAngle)
 					g.select("text")
 						.text(Math.round(t.p*100) + "%")	
-				  // The function passed to attrTween is invoked for each selected element when
-				  // the transition starts, and for each element returns the interpolator to use
-				  // over the course of transition. This function is thus responsible for
-				  // determining the starting angle of the transition (which is pulled from the
-				  // element’s bound datum, d.endAngle), and the ending angle (simply the
-				  // newAngle argument to the enclosing function).
-				  return function(d) {
-
-				    // To interpolate between the two angles, we use the default d3.interpolate.
-				    // (Internally, this maps to d3.interpolateNumber, since both of the
-				    // arguments to d3.interpolate are numbers.) The returned function takes a
-				    // single argument t and returns a number between the starting angle and the
-				    // ending angle. When t = 0, it returns d.endAngle; when t = 1, it returns
-				    // newAngle; and for 0 < t < 1 it returns an angle in-between.
-				    var interpolate = d3.interpolate(d.endAngle, newAngle);
-
-				    // The return value of the attrTween is also a function: the function that
-				    // we want to run for each tick of the transition. Because we used
-				    // attrTween("d"), the return value of this last function will be set to the
-				    // "d" attribute at every tick. (It’s also possible to use transition.tween
-				    // to run arbitrary code for every tick, say if you want to set multiple
-				    // attributes from a single function.) The argument t ranges from 0, at the
-				    // start of the transition, to 1, at the end.
-				    return function(t) {
-
-				      // Calculate the current arc angle based on the transition time, t. Since
-				      // the t for the transition and the t for the interpolate both range from
-				      // 0 to 1, we can pass t directly to the interpolator.
-				      //
-				      // Note that the interpolated angle is written into the element’s bound
-				      // data object! This is important: it means that if the transition were
-				      // interrupted, the data bound to the element would still be consistent
-				      // with its appearance. Whenever we start a new arc transition, the
-				      // correct starting angle can be inferred from the data.
-				      d.endAngle = interpolate(t);
-
-				      // Lastly, compute the arc path given the updated data! In effect, this
-				      // transition uses data-space interpolation: the data is interpolated
-				      // (that is, the end angle) rather than the path string itself.
-				      // Interpolating the angles in polar coordinates, rather than the raw path
-				      // string, produces valid intermediate arcs during the transition.
-				      return arc(d);
-				    };
-				  };
+					return function(d) {
+						var interpolate = d3.interpolate(d.endAngle, newAngle);
+						return function(t) {
+							d.endAngle = interpolate(t);
+							return arc(d);
+				    	}
+				  	};
+				}	
+				// chosen country dropdown menu
+				$("#" + t.id + "chooseGeography").chosen({allow_single_deselect:false, width:"98%"})
+					.change(function(c){
+						var c = c.target.value;
+						if (c){
+							t.obj.country = c;
+							var q = new Query();
+							var qt = new QueryTask(t.url + "/" + t.geography );
+							q.where = "CNTRY_NAME ='" + c + "'";
+							q.returnGeometry = true;
+							q.outFields = ["*"];
+							qt.execute(q, function(e){
+								t.map.graphics.clear();
+								t.csym = e.features[0];
+								t.csym.setSymbol(t.sym1);
+								t.map.graphics.add(t.csym);
+								var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent())
+								t.map.setExtent(ext,true);
+								if ( $("#" + t.id + "t3res1")[0].checked ){
+									t.clicks.showTopThree(t);
+								}	
+							})
+							$.each(t.atts,function(i,v){
+								if (c == v.CNTRY_NAME){
+									$(".geoStatsWrap").slideDown();
+									t.p = v.Mean_Score/100;
+									startTransition();
+									$("#" + t.id + "geography .geoNum span").each(function(i1,v1){
+										var field = v1.id.split("-").pop();
+										if (field.length > 0){
+											var n = t.clicks.numberWithCommas(Math.round(v[field]))
+											$(v1).html(n);
+										}	
+									})
+								}
+							})
+							t.layerDefs[t.geography] = q.where;
+						}else{
+							$(".geoStatsWrap").slideUp();
+						}	
+					});	
+				$("#" + t.id + "t3res1").click(function(c){
+					if (c.currentTarget.checked){
+						t.clicks.showTopThree(t);
+					}else{
+						t.map.graphics.clear();
+						t.csym.setSymbol(t.sym1);
+						t.map.graphics.add(t.csym);
+					}	
+				})	
+			},
+			showTopThree: function(t){
+				var q = new Query();
+				var qt = new QueryTask(t.url + "/" + t.typology );
+				q.where = "Juris ='" + t.obj.country + "'";
+				q.returnGeometry = true;
+				q.outFields = ["*"];
+				qt.execute(q, function(e){
+					$.each(e.features,function(i,v){
+						var f = v;
+						f.setSymbol(t.sym2);
+						t.map.graphics.add(f);
+					})
+				});	
+			},
+			typologySetup:function(t){
+				// build  typography pie chart
+				var tau = 2 * Math.PI;
+				var arc = d3.arc()
+				    .innerRadius(25)
+				    .outerRadius(40)
+				    .startAngle(0);
+				var svg = d3.select(".pie2"),
+				    width = +svg.attr("width"),
+				    height = +svg.attr("height"),
+				    g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");	
+				g.append("text")
+				 	.attr("text-anchor", "middle")
+				 	.attr('font-size', '16px')
+				 	.attr('font-weight', 'bold')
+				 	.attr('fill', '#438c9d')
+				 	.attr('y', 5)
+				 	.text("15%");
+				var background = g.append("path")
+				    .datum({endAngle: tau})
+				    .style("fill", "#ddd")
+				    .attr("d", arc);
+				var foreground = g.append("path")
+				    .datum({endAngle: 0.15 * tau})
+				    .style("fill", "#558139")
+				    .attr("d", arc);
+				function startTransition(){ 
+				   foreground.transition()
+				      .duration(750)
+				      .attrTween("d", arcTween(t.p1*tau))
+				}      
+				function arcTween(newAngle) {
+					g.select("text")
+						.text(Math.round(t.p1*100) + "%")	
+					return function(d) {
+						var interpolate = d3.interpolate(d.endAngle, newAngle);
+						return function(t) {
+							d.endAngle = interpolate(t);
+							return arc(d);
+				    	}
+				  	};
 				}
+				// build typography bar chart
+				var data1 = [{"inputs":"Proportion of lost mangrove contiguous with extant","barval":66, "label":"25%", "field": "Prop_loss"},
+							{"inputs":"Median patch size","barval":33, "label":"Low", "field": "Med_Patch"}, {"inputs":"Sediment change","barval":100, "label":"None", "field": "Sediment"},
+							{"inputs":"Time since loss","barval":66, "label":"Pre-2007", "field": "Time_Loss"}, {"inputs":"Future SLR","barval":66, "label":"None", "field": "Future_SLR"},
+							{"inputs":"Antecedent SLR","barval":33, "label":"High", "field": "Ant_SLR"}, {"inputs":"Tidal range","barval":25, "label":"Meso", "field": "Tidal_range"}];			
 
+				// set the dimensions and margins of the graph
+				var margin = {top: 20, right: 80, bottom: 10, left: 140},
+					width = 310 - margin.left - margin.right,
+					height = 200 - margin.top - margin.bottom;
 
+				// set the ranges
+				var y = d3.scaleBand()
+					.range([height, 0])
+					.padding(0.1);
 
+				var x = d3.scaleLinear()
+					.range([0, width]);
+				          
+				// format the data
+				data1.forEach(function(d) {
+						d.barval = +d.barval;
+					});
 
+				// append the svg object to the body of the page, append a 'group' element to 'svg', moves the 'group' element to the top left margin
+				var svg = d3.select("#" + t.id + "barDiv").append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-
-				// var data = [
-				//     {name: 'dogs', count: 59, color: '#558139'},
-			 //    	{name: 'cats', count: 41, color: '#AAD091'},
-			 //    ];
-			 //    var totalCount = 59;		
-			    
-			 //    var width = 100,
-			 //    height = 100,
-			 //    radius = 50;
-
-				// var arc = d3.arc()
-				// 	.outerRadius(radius - 10)
-				// 	.innerRadius(25);
-
-				// var pie = d3.pie()
-				// 	.sort(null)
-				// 	.value(function(d) {
-				// 	    return d.count;
-				// 	});
-
-				// var svg = d3.select("#" + t.id + 'pie1').append("svg")
-				// 	.attr("width", width)
-				// 	.attr("height", height)
-				// 	.append("g")
-				// 	.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-			 //    var g = svg.selectAll(".arc")
-			 //      .data(pie(data))
-			 //      .enter().append("g");    
-
-			 //   	g.append("path")
-			 //    	.attr("d", arc)
-				// 	.style("fill", function(d,i) {
-				// 		return d.data.color;
-				// 	});
-
- 			//     g.append("text")
-				// 	.attr("text-anchor", "middle")
-				// 	.attr('font-size', '16px')
-				// 	.attr('y', 5)
-				// 	.text(totalCount + "%");
-
-				// $("#" + t.id + "pie1Up").click(function(){
-				// 	var data = [
-				//     	{name: 'dogs', count: 75, color: '#558139'},
-			 //    		{name: 'cats', count: 25, color: '#AAD091'},
-			 //    	];
+				var wc = 0;	
+				function updateBar(data1){
+					// Scale the range of the data in the domains
+					x.domain([0, d3.max(data1, function(d){ return d.barval; })])
+					y.domain(data1.map(function(d) { return d.inputs; }));	
 					
-			 //    	// var g = svg.selectAll(".arc")
-				// 	// 	.data(pie(data))
-				// 	// 	.enter().append("g"); 
-				// 	// g.append("path")
-			 //  //   		.attr("d", arc)
-				// 	// 	.style("fill", function(d,i) {
-				// 	// 	return d.data.color;
-				// 	// });
-				// })	
+					var bar = svg.selectAll(".bar")
+			        	      .data(data1);
+					var barExit = bar.exit().remove();
+					var barEnter = bar.enter()
+									.append("g")
+									.attr("class", "bar");
+
+			        var barRects = barEnter.append("rect")
+			            .attr("x", function(d) {
+				            return x(0);
+				        })
+			        	.attr("y", function(d) { return y(d.inputs); })
+			        	.attr("width", function(d) {return x(d.barval); } )   
+			        	.attr("height", y.bandwidth())
+
+					var barTexts = barEnter.append("text")
+						.attr("x", (function(d) { return x(d.barval) + 4; }  ))
+						.attr("y", (function(d) { return y(d.inputs) + 4; }  ))
+						.attr("fill", "#438c9d")
+						.attr("dy", ".75em")
+						.text(function(d) { return d.label; })
+
+					var barRectUpdate = bar.select("rect")
+						.transition()
+						.duration(750)
+						.attr("x", function(d) {
+							return x(0);
+						})
+						.attr("y", function(d) { return y(d.inputs); })
+			        	.attr("width", function(d) {return x(d.barval); } )   
+			        	.attr("height", y.bandwidth())		
+
+			        var barTextsUpdate = bar.select("text")
+						.transition()
+           				.duration(750)
+           				.attr("x", (function(d) { return x(d.barval) + 4; }  ))
+						.attr("y", (function(d) { return y(d.inputs) + 4; }  ))
+						.attr("dy", ".75em")
+						.text(function(d) { return d.label; })
+
+					if (wc == 0){
+						svg.selectAll(".tick text")
+    	  					.call(wrap, 155);	
+	    			}
+	      		}		
+	      		updateBar(data1);
+	      		
+	      		// add the y Axis
+				svg.append("g")
+					.call(d3.axisLeft(y))
+					.attr("font-size", 11)
+
+				svg.selectAll(".tick text")
+      				.call(wrap, 155);
+
+	      		function updateBarData(atts){
+	      			var fields = [ ["Tidal_range","Tidal_range_1"],["Ant_SLR","Ant_SLR1"], ["Future_SLR","Future_SLR1"], ["Time_Loss","Time_Loss1"],
+	      						   ["Sediment","Sediment1"], ["Med_Patch","Med_Patch1"], ["Prop_loss","Prop_loss"] ]
+	      			$.each(data1,function(i,v){
+						$.each(fields,function(i1,v1){
+							if (v.field == v1[0]){
+								v.barval = atts[v1[1]]
+								var lbl = atts[v1[0]];
+								if (isNaN(lbl)){
+									v.label = lbl	
+								}else{
+									v.label = Math.round(lbl) + "%"
+								}
+							}
+						})
+	      			})
+	      			updateBar(data1)
+	      			wc = 1;
+	      		}
+
+      			//wraps text for long labels
+				function wrap(text, width) {
+					  text.each(function() {
+					    var text = d3.select(this),
+					        words = text.text().split(/\s+/).reverse(),
+					        word,
+					        line = [],
+					        lineNumber = 0,
+					        lineHeight = 1.1 
+					    var y = text.attr("y"),
+					        dy = parseFloat(text.attr("dy"));
+					    var tspan = text.text(null).append("tspan").attr("x", -5).attr("y", y).attr("dy", dy + "em");
+					    while (word = words.pop()) {
+					      line.push(word);
+					      tspan.text(line.join(" "));
+					      if (tspan.node().getComputedTextLength() > width) {
+					        tspan.attr("y", -5);
+					        line.pop();
+					        tspan.text(line.join(" "));
+					        line = [word];
+					        tspan = text.append("tspan").attr("x", -5).attr("y", y-5).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+					      }
+					    }
+					  });
+					}
+
+
+
+				// map clicks
+				t.map.on("click",function(c){
+					if (t.open == "yes"){
+						if (t.obj.ebOpt == "geography"){
+							var q = new Query();
+							var qt = new QueryTask(t.url + "/" + t.geography);
+							q.geometry = c.mapPoint;
+							q.where = "CNTRY_NAME <> 'Global'";
+							q.returnGeometry = false;
+							qt.execute(q, function(e){
+								if (e.features[0]){
+									var c = e.features[0].attributes.CNTRY_NAME;
+									$("#" + t.id + "chooseGeography").val(c).trigger("chosen:updated").change();
+								}
+								t.map.setMapCursor("pointer");	
+							})
+						}
+						if (t.obj.ebOpt == "typology"){
+							var q = new Query();
+							var qt = new QueryTask(t.url + "/" + t.typology);
+							q.geometry = c.mapPoint;
+							q.outFields = ["*"];
+							q.returnGeometry = true;
+							t.map.graphics.clear();
+							qt.execute(q, function(e){
+								if (e.features[0]){
+									//add graphics
+									var f = e.features[0];
+									f.setSymbol(t.sym2);
+									t.map.graphics.add(f);
+									//define attributes
+									var atts = e.features[0].attributes;
+									//send data to typology ie chart
+									t.p1 = atts.Rest_Score/100;
+									startTransition();
+									//set up and send data to bar chart
+									updateBarData(atts);
+									// populate attribute fields
+									$("#" + t.id + "typology .geoNum span").each(function(i1,v1){
+										var field = v1.id.split("-").pop();
+										if ( field.slice(-1) == "_" ){
+											field = field.slice(0, -1);
+										}
+										if (field.length > 0){
+											if (isNaN(atts[field])){
+												$(v1).html(atts[field])
+											}else{
+												var n = t.clicks.numberWithCommas(Math.round(atts[field]))
+												$(v1).html(n);
+											}	
+										}	
+									})
+									t.map.setMapCursor("pointer");
+									$(".typeStatsWrap").slideDown();
+								}	
+							})
+						}
+					}
+				})
+			},
+			buildPieChart: function(t){
+				
 			},
 			updateBarGraphs: function(t){
 				
