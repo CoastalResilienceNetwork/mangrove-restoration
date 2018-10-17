@@ -18,7 +18,7 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 					t.layersArray = t.dynamicLayer.layerInfos;
 					// Query all features 
 					var q = new Query();
-					var qt = new QueryTask(t.url + "/" + t.geography );
+					var qt = new QueryTask(t.url + "/" + t.geoEnv );
 					q.where = "OBJECTID > -1";
 					q.returnGeometry = false;
 					q.outFields = ["*"];
@@ -27,18 +27,26 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 						t.features = e.features;
 						$("#" + t.id + "chooseGeography").append("<option></option>")
 						var cntry = [];
+						var region = [];
 						$.each(e.features,function(i,v){
 							t.atts.push(v.attributes)
-							var c = v.attributes.CNTRY_NAME;
-							if (c != "Global"){
-								cntry.push(c)
+							if (v.attributes.GeoType == "Country"){
+								cntry.push(v.attributes.CNTRY_NAME)
 							}
+							if (v.attributes.GeoType == "Region"){
+								region.push(v.attributes.CNTRY_NAME)
+							}	
 						})		
 						var cs = cntry.sort();
+						var rg = region.sort();
 						$.each(cs,function(i,v){
-							$("#" + t.id + "chooseGeography").append("<option value='"+v+"'>"+v+"</option>")	
+							$("#" + t.id + "countryOg").append("<option value='"+v+"'>"+v+"</option>")	
 						})
-						$("#" + t.id + "chooseGeography").trigger("chosen:updated");
+						$.each(rg,function(i,v){
+							$("#" + t.id + "regionOg").append("<option value='"+v+"'>"+v+"</option>")	
+						})
+						$("#" + t.id + "chooseGeography").val("Global").trigger("chosen:updated").trigger("change");
+						//$("#show-single-plugin-mode-help").trigger("click")
 					});	
 
 					$("#" + t.id + "ebOptDiv input[value='" + t.obj.ebOpt + "']").trigger("click");
@@ -53,9 +61,17 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 				t.sym1  = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([88,116,215,1]), 1), new Color([88,116,215]);
 				t.sym2  = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([168,0,132]), 1), new Color([168,0,132]);
 
-				t.map.on("extent-change",function(){
-					t.map.setMapCursor("pointer");
+				t.map.on("update-start",function(){
+					t.map.setMapCursor("wait")
+					$(".geoNum").css("cursor","wait")
 				})
+				t.map.on("update-end",function(){
+					t.map.setMapCursor("pointer")
+					$(".geoNum").css("cursor","pointer")
+				})
+				// t.map.on("extent-change",function(){
+				// 	t.map.setMapCursor("pointer");
+				// })
 			},
 			clearAtts: function(t){
 				t.map.graphics.clear();

@@ -3,7 +3,7 @@ Dijit ContentPane to hold all the elements. The ContentPane is assigned a dynami
 takes the ContentPane id and prepends it to every element with a declared id in this HTML before the elements are created.
 The unique ContentPane id makes all the element ids unique and prevents duplicate id errors across other apps.-->
 <div id="top-wrap" class="mr-top-wrap">
-	<h3>Explore Restoration Scores By:</h3>
+	<h3 style="margin-top:1rem;">Explore Restoration Scores By:</h3>
 	<div id="ebOptDiv" class="toggle-btn ebOptDiv">
 		<input type="radio" id="ebOpt1" name="ebOpt" value="geography"/>
 		<label for="ebOpt1">Geography</label>
@@ -11,100 +11,107 @@ The unique ContentPane id makes all the element ids unique and prevents duplicat
 		<label for="ebOpt2">Typology</label>
 	</div>
 	<section id="geography" class="mr-section-wrap geography">
-		<div class="chosen-wrap" style="margin-bottom:16px;">
+		<div style="margin-left:2px;">Select a Country or Region</div>
+		<div class="chosen-wrap" style="margin-bottom:4px;">
 			<select data-placeholder="Choose a Geography to Explore" id="chooseGeography" class="chosen">
+				<optgroup id="regionOg" label="Regions"></optgroup>
+				<optgroup id="countryOg" label="Countries"></optgroup>
 			</select>
 		</div>
 		<div class="geoStatsWrap">
-			<section>
-				<div class="geoNumWrap">
-					<div class="geoNum">
-						<div>Total Restorable Area:</div><div><span id="-Tot_Restor"></span> <span>ha</span></div>
-					</div>	
-					<div class="geoNum">
-						<div>From Loss:</div><div><span id="-Rest_Area_Loss"></span> <span>ha</span></div>
-					</div>
-					<div class="geoNum">
-						<div>From Degradation:</div><div><span id="-Rest_Area_Dgrd"></span> <span>ha</span></div>
-					</div>	
-				</div>	
-				<div style="display:flex; margin-top:12px; margin-left:136px;">
-					<div style="font-weight:bold; font-size:16px; text-align:center; margin-top:15px;">Mean<br>Restoration<br>Score</div>
-					<div id="pie1"><svg class="pie1" width="100" height="100"></svg></div>	
-				</div>
-			</section>	
-			<h4 style="margin-top:1rem;">Ecosystem Service Values For Restored Lost Mangroves</h4>
+			<div style="margin:12px 0 -7px 12px;">Click boxes below to change mangrove symbology on map<br>
+				Click a mangrove area on map to view its statistics
+			</div>
 			<div class="geoNumWrap">
 				<div class="geoNum">
-					<div>Blue Carbon:</div><div><span id="-SOC"></span> <span>Mg</span></div>
+					<div>Total Restorable Area</div><div><span id="-Tot_Restor"></span> <span>ha</span></div>
+				</div>	
+				<div class="geoNum">
+					<div>Percent Restorable</div><div><span id="-Restor_pct"></span><span>%</span></div>
+				</div>
+				<div class="geoNum">
+					<div>Area of Loss</div><div><span id="-Rest_Area_Loss"></span> <span>ha</span> <span>(</span><span id="-Area_loss_pct"></span><span>%)</span></div>
+				</div>
+				<div class="geoNum">
+					<div>Area Degraded</div><div><span id="-Rest_Area_Dgrd"></span> <span>ha</span> <span>(</span><span id="-Area_dgrd_pct"></span><span>%)</span></div>
+				</div>	
+				<div class="geoNum">
+					<div>Total Mangrove in 2016</div><div><span id="-Total_2016"></span> <span>ha</span></div>
+				</div>
+				<div class="geoNum" style="display:flex; min-width:180px;">
+					<div style="min-width:80px">Mean Restoration Potential Score</div>
+					<div id="pie1"><svg class="pie1" width="80" height="80"></svg></div>	
+				</div>	
+				<div class="geoNum" style="border-color:#bbb; background:#ecf7fb;"><div>Mangrove Typology</div></div>
+			</div>	
+			<div style="margin:10px 0 -7px 12px; font-weight:bolder;">Ecosystem Services Value for Restored Mangroves</div>
+			<div class="geoNumWrap">
+				<div class="geoNum">
+					<div>Soil Organic Carbon</div><div><span id="-SOC"></span> <span>Mg</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>People Protected:</div><div><span id="-People"></span></div>
+					<div>Aboveground Carbon</div><div><span id="-AGB"></span> <span>Mg</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Built Capital Protected:</div><div><span>$</span><span id="-Capital"></span></div>
+					<div>People Protected</div><div><span id="-People"></span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Fisheries Catch Score:</div><div><span id="-Fish_Score"></span></div>
+					<div>Commercial Fish Enhancement</div><div><span id="-Fish_Score"></span> <span>indiv./yr</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Aboveground Biomass:</div><div><span id="-AGB"></span> <span>tonnes</span></div>
+					<div>Commercial Invert Enhancement</div><div><span id="-Fish_Score_Inv"></span> <span>indiv./yr</span></div>
 				</div>
 			</div>
-			<label class="form-component" for="t3res1" style="font-size:14px; margin-top:10px; margin-left:10px; font-weight:bold;">
-				<input type="checkbox" id="t3res1" name="t3res">
-				<div class="check"></div><span style="margin-left:4px;" class="form-text">Select Top 3 Restorable Areas</span>
-			</label>
 		</div>		
 	</section>
-	<section id="typology" class="mr-section-wrap">
-		<h4 style="margin-top:1rem;">Click Mangrove Types on Map</h4>
+	<section id="typology" class="mr-section-wrap typology">
 		<div class="typeStatsWrap">
-			<section>
-				<div class="geoNumWrap">
-					<div class="geoNum">
-						<div>Mangrove Type:</div><div><span id="-Class"></span></div>
-					</div>
-					<div class="geoNum">	
-						<div>Max Mangrove Area in Last 20 Years:</div><div><span id="-Max_Area_20_ha"></span> <span>ha</span></div>
-					</div>
-					<div class="geoNum">	
-						<div>Area of Loss:</div><div><span>$</span><span id="-Area_loss_ha"></span> <span>ha</span> <span>(</span><span id="-Area_loss_ha"></span><span>%)</span></div>
-					</div>
-					<div class="geoNum">	
-						<div>Restorable Mangrove:</div><div><span>$</span><span id="-Restor_Tot_ha"></span> <span>ha</span> <span>(</span><span id="-Restor_Tot_pct"></span><span>%)</span></div>
-					</div>
-					<div class="geoNum">	
-						<div>Restorable Area From Loss:</div><div><span>$</span><span id="-Rest_Area_Loss"></span> <span>ha</span> <span>(</span><span id="-Rest_Area_Loss_pct"></span><span>%)</span></div>
-					</div>
-					<div class="geoNum">	
-						<div>Restorable Mangrove From Degraded:</div><div><span>$</span><span id="-Area_dgrd_ha"></span> <span>ha</span> <span>(</span><span id="-Area_dgrd_pct"></span><span>%)</span></div>
-					</div>
-				</div>
-				<div style="display:flex;">	
-					<div id="barDiv"></div>
-					<div>
-						<div id="pie2" style="margin-top:14px;"><svg class="pie2" width="100" height="100"></svg></div>
-						<div style="font-weight:bold; font-size:14px; margin-top:-10px; text-align:center;">Restoration<br>Potential<br>Score</div>	
-					</div>
-				</div>
-			</section>		
-			<h4 style="margin-top:1rem;">Ecosystem Service Values For Restored Lost Mangroves</h4>
+			<div style="margin:12px 0 -7px 12px;">Click boxes below to change mangrove symbology on map<br>
+				Click a mangrove area on map to view its statistics
+			</div>
 			<div class="geoNumWrap">
 				<div class="geoNum">
-					<div>Blue Carbon:</div><div><span id="-SOC_"></span> <span>Mg</span></div>
+					<div>Mangrove Type</div><div><span id="-Class"></span></div>
 				</div>
 				<div class="geoNum">	
-					<div>People Protected:</div><div><span id="-People_"></span></div>
+					<div>Max Mangrove Area 1996 – 2016</div><div><span id="-Max_Area_20_ha"></span> <span>ha</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Built Capital Protected:</div><div><span>$</span><span id="-Capital_"></span></div>
+					<div>Area of Loss</div><div><span id="-Area_loss_ha"></span> <span>ha</span> <span>(</span><span id="-Area_loss_pct_"></span><span>%)</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Fisheries Catch Score:</div><div><span id="-Fish_Score_"></span></div>
+					<div>Restorable Area</div><div><span id="-Rest_Area_Loss"></span> <span>ha</span></div>
 				</div>
 				<div class="geoNum">	
-					<div>Aboveground Biomass:</div><div><span id="-AGB_"></span> <span>tonnes</span></div>
+					<div>Percent Restorable</div><div><span id="-Rest_Area_Loss_pct"></span><span>%</span></div>
+				</div>
+				<div class="geoNum">	
+					<div>Area Degraded</div><div><span id="-Area_dgrd_ha"></span> <span>ha</span> <span>(</span><span id="-Area_dgrd_pct"></span><span>%)</span></div>
+				</div>
+			</div>
+			<div style="display:flex;">	
+				<div id="barDiv"></div>
+				<div class="geoNum">
+					<div>Restoration Potential Score</div>	
+					<div id="pie2" style="margin:10px 0 0px 14px;"><svg class="pie2" width="80" height="80"></svg></div>
+				</div>
+			</div>
+			<div style="margin:10px 0 -7px 12px; font-weight:bolder;">Ecosystem Services Value for Restored Mangroves</div>
+			<div class="geoNumWrap">
+				<div class="geoNum">
+					<div>Soil Organic Carbon</div><div><span id="-SOC_"></span> <span>Mg</span></div>
+				</div>
+				<div class="geoNum">	
+					<div>Aboveground Carbon</div><div><span id="-AGB_"></span> <span>Mg</span></div>
+				</div>
+				<div class="geoNum">	
+					<div>People Protected</div><div><span id="-People_"></span></div>
+				</div>
+				<div class="geoNum">	
+					<div>Commercial Fish Enhancement</div><div><span id="-Fish_Score_"></span> <span>indiv./yr</span></div>
+				</div>
+				<div class="geoNum">	
+					<div>Commercial Invert Enhancement</div><div><span id="-Fish_Score_Inv_"></span> <span>indiv./yr</span></div>
 				</div>
 			</div>
 		</div>	
@@ -142,5 +149,8 @@ The unique ContentPane id makes all the element ids unique and prevents duplicat
 			</div>		
 		</div>	
 	</section>	
+	<section class="mr-section-wrap geography" style="color:#757b80; padding:10px; font-size:12px;">
+		<div>Typological units have been assigned to the country in which they predominantly located, and geographical statistics have been calculated based on that unit’s area.  This map and associated statistics are without prejudice to the status of or sovereignty over any territory, to the delimitation of international frontiers and boundaries and to the name of any territory, city or area</div>
+	</section>
 </div>	
 

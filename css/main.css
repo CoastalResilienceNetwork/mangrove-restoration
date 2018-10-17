@@ -1,14 +1,17 @@
-.ebOptDiv{
-	
+.mr-top-wrap .ebOptDiv{
+	margin-bottom:4px;
 }
 .mr-section-wrap{
 	display:none;
 }
 .geoStatsWrap, .typeStatsWrap{
-	display:none;
+	display:none; margin-bottom:10px;
 }
 .geography{
 	padding-top:4px;
+}
+.geography .chosen-wrap .chosen-container-single span{
+	font-weight:bold; font-size:14px;
 }
 .geoNumWrap{
 	display:flex; flex-wrap:wrap;
@@ -23,6 +26,7 @@
     box-shadow: 0 1px 1px rgba(16,22,26,.2);
     border: 1pt solid #ddd;
     padding: 2px 0 2px 4px;
+    cursor:pointer;
 }
 .geoNum div{
 	flex:1;
@@ -45,9 +49,9 @@
 .tick text{
 	margin-right:10px;
 }
-/*.domain{
+.domain{
 	display:none;
-}*/
+}
 .tick line{
 	stroke:#fff;
 }

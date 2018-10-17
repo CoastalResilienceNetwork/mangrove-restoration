@@ -16,17 +16,19 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				// global variables
 				t.p = 0.55;
 				t.p1 = 0.55;
-				t.geography = 2;
+				t.geography = 3;
+				t.geoEnv = 4;
+				t.typoZoom = 2;
 				t.typology = 0;
 				// switch between geography and typology 	
 				$("#" + t.id + "ebOptDiv input").click(function(c){
 					var v = c.currentTarget.value;
 					$(".mr-section-wrap").hide();
-					$("#" + t.id + v).show();
+					$("#" + t.id + " ." + v).show();
 					t.obj.ebOpt = v;
 					t.map.graphics.clear();
-					$("#" + t.id + "chooseGeography").val("").trigger("chosen:updated").change();
-					$(".typeStatsWrap").slideUp();
+					//$("#" + t.id + "chooseGeography").val("").trigger("chosen:updated").change();
+					//$(".typeStatsWrap").slideUp();
 					t.map.setMapCursor("pointer");
 				})	
 				// reference layer clicks
@@ -40,9 +42,28 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 							t.obj.visibleLayers.splice(index, 1);
 						}
 					}
-					
 					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
-
+				})
+				// Stat box clicks
+				$("#" + t.id + "top-wrap .geoNum").click(function(c){
+					$("#" + t.id + "top-wrap .geoNum").css("border-color", "#ddd")
+					$("#" + t.id + "top-wrap .geoNum").css("background", "#fff")
+					$(c.currentTarget).css("border-color","#bbb")
+					$(c.currentTarget).css("background","#ecf7fb")
+					var i;
+					for (i = 1; i < 20; i++) {
+					    var index = t.obj.visibleLayers.indexOf(String(i));
+						if (index > -1){
+							t.obj.visibleLayers.splice(index, 1);
+						}
+					}
+					var lbl = $(c.currentTarget).children().eq(0).html() 
+					$.each(t.layersArray,function(i,v){
+						if ( v.name == lbl ){
+							t.obj.visibleLayers.push(String(v.id))
+						}
+					})
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 				})
 			},
 			geographySetup: function(t){
@@ -50,7 +71,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				var tau = 2 * Math.PI;
 				var arc = d3.arc()
 				    .innerRadius(25)
-				    .outerRadius(40)
+				    .outerRadius(38)
 				    .startAngle(0);
 				var svg = d3.select(".pie1"),
 				    width = +svg.attr("width"),
@@ -94,20 +115,17 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 						if (c){
 							t.obj.country = c;
 							var q = new Query();
-							var qt = new QueryTask(t.url + "/" + t.geography );
+							var qt = new QueryTask(t.url + "/" + t.geoEnv );
 							q.where = "CNTRY_NAME ='" + c + "'";
 							q.returnGeometry = true;
 							q.outFields = ["*"];
 							qt.execute(q, function(e){
-								t.map.graphics.clear();
-								t.csym = e.features[0];
-								t.csym.setSymbol(t.sym1);
-								t.map.graphics.add(t.csym);
-								var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent())
-								t.map.setExtent(ext,true);
-								if ( $("#" + t.id + "t3res1")[0].checked ){
-									t.clicks.showTopThree(t);
-								}	
+								// t.map.graphics.clear();
+								// t.csym = e.features[0];
+								// t.csym.setSymbol(t.sym1);
+								// t.map.graphics.add(t.csym);
+								var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent().expand(0.85))
+								t.map.setExtent(ext,true);	
 							})
 							$.each(t.atts,function(i,v){
 								if (c == v.CNTRY_NAME){
@@ -128,15 +146,6 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 							$(".geoStatsWrap").slideUp();
 						}	
 					});	
-				$("#" + t.id + "t3res1").click(function(c){
-					if (c.currentTarget.checked){
-						t.clicks.showTopThree(t);
-					}else{
-						t.map.graphics.clear();
-						t.csym.setSymbol(t.sym1);
-						t.map.graphics.add(t.csym);
-					}	
-				})	
 			},
 			showTopThree: function(t){
 				var q = new Query();
@@ -157,7 +166,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				var tau = 2 * Math.PI;
 				var arc = d3.arc()
 				    .innerRadius(25)
-				    .outerRadius(40)
+				    .outerRadius(38)
 				    .startAngle(0);
 				var svg = d3.select(".pie2"),
 				    width = +svg.attr("width"),
@@ -195,15 +204,15 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				  	};
 				}
 				// build typography bar chart
-				var data1 = [{"inputs":"Proportion of lost mangrove contiguous with extant","barval":66, "label":"25%", "field": "Prop_loss"},
-							{"inputs":"Median patch size","barval":33, "label":"Low", "field": "Med_Patch"}, {"inputs":"Sediment change","barval":100, "label":"None", "field": "Sediment"},
+				var data1 = [{"inputs":"Percent contiguous","barval":66, "label":"25%", "field": "Prop_loss"},
+							{"inputs":"Median patch size","barval":33, "label":"Low", "field": "Med_Patch"}, {"inputs":"Sus. sediment trend","barval":100, "label":"None", "field": "Sediment"},
 							{"inputs":"Time since loss","barval":66, "label":"Pre-2007", "field": "Time_Loss"}, {"inputs":"Future SLR","barval":66, "label":"None", "field": "Future_SLR"},
 							{"inputs":"Antecedent SLR","barval":33, "label":"High", "field": "Ant_SLR"}, {"inputs":"Tidal range","barval":25, "label":"Meso", "field": "Tidal_range"}];			
 
 				// set the dimensions and margins of the graph
-				var margin = {top: 20, right: 80, bottom: 10, left: 140},
-					width = 310 - margin.left - margin.right,
-					height = 200 - margin.top - margin.bottom;
+				var margin = {top: 18, right: 80, bottom: 0, left: 120},
+					width = 300 - margin.left - margin.right,
+					height = 150 - margin.top - margin.bottom;
 
 				// set the ranges
 				var y = d3.scaleBand()
@@ -225,7 +234,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 					.append("g")
 					.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-				var wc = 0;	
+				var wc = 0;
 				function updateBar(data1){
 					// Scale the range of the data in the domains
 					x.domain([0, d3.max(data1, function(d){ return d.barval; })])
@@ -270,11 +279,12 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 						.attr("y", (function(d) { return y(d.inputs) + 4; }  ))
 						.attr("dy", ".75em")
 						.text(function(d) { return d.label; })
-
-					if (wc == 0){
-						svg.selectAll(".tick text")
-    	  					.call(wrap, 155);	
-	    			}
+					// if (wc == 1 ){
+					// 	svg.selectAll(".tick text")
+    	//   					.call(wrap, 155);
+    	//   					svg.selectAll(".tick text")
+    	//   					.call(wrap, 155);	 	
+	    // 			}
 	      		}		
 	      		updateBar(data1);
 	      		
@@ -283,12 +293,12 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 					.call(d3.axisLeft(y))
 					.attr("font-size", 11)
 
-				svg.selectAll(".tick text")
-      				.call(wrap, 155);
+				// svg.selectAll(".tick text")
+        			//	.call(wrap, 155);
 
 	      		function updateBarData(atts){
-	      			var fields = [ ["Tidal_range","Tidal_range_1"],["Ant_SLR","Ant_SLR1"], ["Future_SLR","Future_SLR1"], ["Time_Loss","Time_Loss1"],
-	      						   ["Sediment","Sediment1"], ["Med_Patch","Med_Patch1"], ["Prop_loss","Prop_loss"] ]
+	      			var fields = [ ["Tidal_range","Tidal_range1"],["Ant_SLR","Ant_SLR1"], ["Future_SLR","Future_SLR1"], ["Time_Loss","Time_Loss1"],
+	      						   ["Sediment","Sediment1"], ["Med_Patch","Med_Patch1"], ["Prop_loss","Prop_loss1"] ]
 	      			$.each(data1,function(i,v){
 						$.each(fields,function(i1,v1){
 							if (v.field == v1[0]){
@@ -303,11 +313,12 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 						})
 	      			})
 	      			updateBar(data1)
-	      			wc = 1;
+	      			wc = wc + 1;
 	      		}
 
       			//wraps text for long labels
 				function wrap(text, width) {
+					console.log("wrap")
 					  text.each(function() {
 					    var text = d3.select(this),
 					        words = text.text().split(/\s+/).reverse(),
@@ -337,60 +348,74 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				// map clicks
 				t.map.on("click",function(c){
 					if (t.open == "yes"){
-						if (t.obj.ebOpt == "geography"){
-							var q = new Query();
-							var qt = new QueryTask(t.url + "/" + t.geography);
-							q.geometry = c.mapPoint;
-							q.where = "CNTRY_NAME <> 'Global'";
-							q.returnGeometry = false;
-							qt.execute(q, function(e){
-								if (e.features[0]){
-									var c = e.features[0].attributes.CNTRY_NAME;
-									$("#" + t.id + "chooseGeography").val(c).trigger("chosen:updated").change();
-								}
-								t.map.setMapCursor("pointer");	
-							})
+						var index = t.obj.visibleLayers.indexOf("0")
+						if (index > -1){
+							t.obj.visibleLayers.splice(index,1)
 						}
-						if (t.obj.ebOpt == "typology"){
-							var q = new Query();
-							var qt = new QueryTask(t.url + "/" + t.typology);
-							q.geometry = c.mapPoint;
-							q.outFields = ["*"];
-							q.returnGeometry = true;
-							t.map.graphics.clear();
-							qt.execute(q, function(e){
-								if (e.features[0]){
-									//add graphics
-									var f = e.features[0];
-									f.setSymbol(t.sym2);
-									t.map.graphics.add(f);
-									//define attributes
-									var atts = e.features[0].attributes;
-									//send data to typology ie chart
-									t.p1 = atts.Rest_Score/100;
-									startTransition();
-									//set up and send data to bar chart
-									updateBarData(atts);
-									// populate attribute fields
-									$("#" + t.id + "typology .geoNum span").each(function(i1,v1){
-										var field = v1.id.split("-").pop();
-										if ( field.slice(-1) == "_" ){
-											field = field.slice(0, -1);
-										}
-										if (field.length > 0){
-											if (isNaN(atts[field])){
-												$(v1).html(atts[field])
-											}else{
-												var n = t.clicks.numberWithCommas(Math.round(atts[field]))
-												$(v1).html(n);
-											}	
-										}	
-									})
-									t.map.setMapCursor("pointer");
-									$(".typeStatsWrap").slideDown();
+						t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+						var q = new Query();
+						var qt = new QueryTask(t.url + "/" + t.typology);
+						q.geometry = c.mapPoint;
+						q.outFields = ["*"];
+						q.returnGeometry = false;
+						t.map.graphics.clear();
+						t.map.setMapCursor("wait");
+						qt.execute(q, function(e){
+							if (e.features[0]){
+								if (t.obj.ebOpt == "geography"){
+									$("#" + t.id + "ebOpt2").trigger("click")
 								}	
-							})
-						}
+								//add graphics
+								var f = e.features[0];
+								// f.setSymbol(t.sym2);
+								// t.map.graphics.add(f);
+								//define attributes
+								var atts = e.features[0].attributes;
+								t.layerDefs[0] = "OBJECTID = " + atts.OBJECTID
+								t.dynamicLayer.setLayerDefinitions(t.layerDefs);
+								t.obj.visibleLayers.push("0")
+								t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+								//send data to typology ie chart
+								t.p1 = atts.Rest_Score/100;
+								startTransition();
+								//set up and send data to bar chart
+								updateBarData(atts);
+								// populate attribute fields
+								$("#" + t.id + "typology .geoNum span").each(function(i1,v1){
+									var field = v1.id.split("-").pop();
+									if ( field.slice(-1) == "_" ){
+										field = field.slice(0, -1);
+									}
+									if (field.length > 0){
+										if (isNaN(atts[field])){
+											$(v1).html(atts[field])
+										}else{
+											var n = t.clicks.numberWithCommas(Math.round(atts[field]))
+											$(v1).html(n);
+										}	
+									}	
+								})
+								
+								$(".typeStatsWrap").slideDown();
+								t.map.setMapCursor("pointer");
+								// query for zoom
+								// var q1 = new Query();
+								// var qt1 = new QueryTask(t.url + "/" + t.typoZoom);
+								// q1.where = "Type = '" + atts.Type + "'";
+								// q1.outFields = ["Type"];
+								// q1.returnGeometry = true;
+								// qt.execute(q1, function(e){
+								// 	if (e.features[0]){
+								// 		var f = e.features[0];
+								// 		var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent().expand(1))
+								// 		t.map.setExtent(ext,true);
+								// 	}
+								// 	t.map.setMapCursor("pointer");
+								// })
+							}else{
+								t.map.setMapCursor("pointer");
+							}			
+						})
 					}
 				})
 			},
