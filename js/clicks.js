@@ -414,6 +414,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 								// })
 							}else{
 								t.map.setMapCursor("pointer");
+								$(".typeStatsWrap").slideUp();
 							}			
 						})
 					}
