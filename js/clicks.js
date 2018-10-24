@@ -133,15 +133,15 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 							q.returnGeometry = true;
 							q.outFields = ["*"];
 							t.layerDefs[t.geography] = q.where;
-							var index = t.obj.visibleLayers.indexOf("-1")
-							if (index > -1){
-								t.obj.visibleLayers.splice(index,1)
-								t.obj.visibleLayers.push("1")
-								t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
-							}
 							qt.execute(q, function(e){
 								var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent().expand(0.85))
-								t.map.setExtent(ext,true);	
+								t.map.setExtent(ext,true);
+								var index = t.obj.visibleLayers.indexOf("-1")
+								if (index > -1){
+									t.obj.visibleLayers.splice(index,1)
+									t.obj.visibleLayers.push("1")
+									t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+								}	
 							})
 							$.each(t.atts,function(i,v){
 								if (c == v.CNTRY_NAME){
