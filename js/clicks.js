@@ -98,6 +98,19 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				      .attrTween("d", arcTween(t.p*tau))
 				}      
 				function arcTween(newAngle) {
+					// var num = Math.round(t.p*100)
+					// if (num < 81){
+					// 	foreground.style("fill","#FC4430")
+					// }
+					// if (num < 61){
+					// 	foreground.style("fill","#FC1787")
+					// }
+					// if (num == 0){
+					// 	foreground.style("fill","#0B24FB")
+					// }
+					// if (num > 80){
+					// 	foreground.style("fill","#FEC82E")
+					// }
 					g.select("text")
 						.text(Math.round(t.p*100) + "%")	
 					return function(d) {
@@ -119,11 +132,14 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 							q.where = "CNTRY_NAME ='" + c + "'";
 							q.returnGeometry = true;
 							q.outFields = ["*"];
+							t.layerDefs[t.geography] = q.where;
+							var index = t.obj.visibleLayers.indexOf("-1")
+							if (index > -1){
+								t.obj.visibleLayers.splice(index,1)
+								t.obj.visibleLayers.push("1")
+								t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+							}
 							qt.execute(q, function(e){
-								// t.map.graphics.clear();
-								// t.csym = e.features[0];
-								// t.csym.setSymbol(t.sym1);
-								// t.map.graphics.add(t.csym);
 								var ext = new esri.geometry.Extent(e.features[0].geometry.getExtent().expand(0.85))
 								t.map.setExtent(ext,true);	
 							})
@@ -141,7 +157,6 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 									})
 								}
 							})
-							t.layerDefs[t.geography] = q.where;
 						}else{
 							$(".geoStatsWrap").slideUp();
 						}	
@@ -193,6 +208,19 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				      .attrTween("d", arcTween(t.p1*tau))
 				}      
 				function arcTween(newAngle) {
+					// var num = Math.round(t.p1*100)
+					// if (num < 81){
+					// 	foreground.style("fill","#FC4430")
+					// }
+					// if (num < 61){
+					// 	foreground.style("fill","#FC1787")
+					// }
+					// if (num == 0){
+					// 	foreground.style("fill","#0B24FB")
+					// }
+					// if (num > 80){
+					// 	foreground.style("fill","#FEC82E")
+					// }
 					g.select("text")
 						.text(Math.round(t.p1*100) + "%")	
 					return function(d) {
