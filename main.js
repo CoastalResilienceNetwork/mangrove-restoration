@@ -1,6 +1,6 @@
 // // Pull in your favorite version of jquery 
 require({ 
-	packages: [{ name: "jquery", location: "http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/", main: "jquery.min" }] 
+	packages: [{ name: "jquery", location: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/", main: "jquery.min" }] 
 });
 // Bring in dojo and javascript api classes as well as varObject.json, js files, and content.html
 define([
@@ -19,7 +19,7 @@ function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, conte
 			declare.safeMixin(this, frameworkParameters);
 			// Define object to access global variables from JSON object. Only add variables to varObject.json that are needed by Save and Share. 
 			this.obj = dojo.eval("[" + obj + "]")[0];	
-			this.url = "http://services.coastalresilience.org:6080/arcgis/rest/services/OceanWealth/Mangrove_Restoration/MapServer";
+			this.url = "https://services2.coastalresilience.org/arcgis/rest/services/OceanWealth/Mangrove_Restoration/MapServer";
 			this.layerDefs = [];
 		},
 		// Called after initialize at plugin startup (why the tests for undefined). Also called after deactivate when user closes app by clicking X. 
