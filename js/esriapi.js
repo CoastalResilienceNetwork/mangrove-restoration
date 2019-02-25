@@ -69,9 +69,9 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 					t.map.setMapCursor("pointer")
 					$(".geoNum").css("cursor","pointer")
 				})
-				// t.map.on("extent-change",function(){
-				// 	t.map.setMapCursor("pointer");
-				// })
+				t.map.on("extent-change",function(){
+				 	t.clicks.scaleChange(t);
+				})
 			},
 			clearAtts: function(t){
 				t.map.graphics.clear();

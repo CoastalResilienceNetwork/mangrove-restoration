@@ -51,20 +51,38 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 					$(c.currentTarget).css("border-color","#bbb")
 					$(c.currentTarget).css("background","#ecf7fb")
 					var i;
-					for (i = 1; i < 20; i++) {
+					for (i = 1; i < 31; i++) {
 					    var index = t.obj.visibleLayers.indexOf(String(i));
 						if (index > -1){
 							t.obj.visibleLayers.splice(index, 1);
 						}
 					}
 					var lbl = $(c.currentTarget).children().eq(0).html() 
+					t.twoLayers = [];
 					$.each(t.layersArray,function(i,v){
 						if ( v.name == lbl ){
-							t.obj.visibleLayers.push(String(v.id))
+							t.twoLayers.push(String(v.id))
 						}
 					})
-					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+					t.clicks.scaleChange(t);
 				})
+			},
+			scaleChange: function(t){
+				if (t.twoLayers){
+					$.each(t.twoLayers,function(i,v){
+						var index = t.obj.visibleLayers.indexOf(v);
+						if (index > -1){
+							t.obj.visibleLayers.splice(index, 1);
+						}
+					})
+					var scale = t.map.getScale();
+					if (scale > 73957190){
+						t.obj.visibleLayers.push(t.twoLayers[0]);
+					}else{
+						t.obj.visibleLayers.push(t.twoLayers[1]);
+					}
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+				}	
 			},
 			geographySetup: function(t){
 				// build  geography pie chart
@@ -139,7 +157,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 								var index = t.obj.visibleLayers.indexOf("-1")
 								if (index > -1){
 									t.obj.visibleLayers.splice(index,1)
-									t.obj.visibleLayers.push("1")
+									t.obj.visibleLayers.push("5")
 									t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 								}	
 							})
