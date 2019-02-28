@@ -34,15 +34,18 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				// reference layer clicks
 				$("#" + t.id + "ref-wrap input").click(function(c){
 					var ln = c.currentTarget.value;
+					var l = t.legendItems[ln];
 					if (c.currentTarget.checked){
 						t.obj.visibleLayers.push(ln);	
+						t.clicks.buildRefLegend(t, l);
 					}else{
 						var index = t.obj.visibleLayers.indexOf(ln);
 						if (index > -1){
 							t.obj.visibleLayers.splice(index, 1);
 						}
+						$(`.rl${l.layerId}`).remove();
 					}
-					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers);
 				})
 				// Stat box clicks
 				$("#" + t.id + "top-wrap .geoNum").click(function(c){
@@ -80,10 +83,41 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 						t.obj.visibleLayers.push(t.twoLayers[0]);
 					}else{
 						t.obj.visibleLayers.push(t.twoLayers[1]);
-					}
+					}			
+					var l = t.legendItems[t.twoLayers[1]];
+					t.clicks.buildLegend(t,l);
 					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 				}	
 			},
+			buildLegend: function(t,l){
+				$(`#leg1`).empty();
+				$(`#leg1`).append(` <div class="legendName">${l.layerName}</div> `)
+				$.each(l.legend,function(i,v){
+					$(`#leg1`).append(`
+						<div class="legendItem">
+							<img src="data:image/png;base64,${v.imageData}" width="${v.width}" height="${v.height}" title="${v.label}">
+							<span class="liLabel">${v.label}</span>
+						</div>
+					`)	
+				})
+				if (l.layerName == "Mangrove Typology"){
+					$(`.legendItem`).css(`margin-bottom`,`0`);
+				}else{
+					$(`.legendItem`).css(`margin-bottom`,`-2px`);
+				}
+			},
+			buildRefLegend: function(t,l){
+				$(`#leg2`).append(` <div class="rl${l.layerId}" style="margin-bottom:4px;""></div> `)
+				$(`.rl${l.layerId}`).append(` <div class="legendName">${l.layerName}</div> `)
+				$.each(l.legend,function(i,v){
+					$(`.rl${l.layerId}`).append(`
+						<div class="legendItem">
+							<img src="data:image/png;base64,${v.imageData}" width="${v.width}" height="${v.height}" title="${v.label}">
+							<span class="liLabel">${v.label}</span>
+						</div>
+					`)	
+				})
+			},	
 			geographySetup: function(t){
 				// build  geography pie chart
 				var tau = 2 * Math.PI;
@@ -157,7 +191,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 								var index = t.obj.visibleLayers.indexOf("-1")
 								if (index > -1){
 									t.obj.visibleLayers.splice(index,1)
-									t.obj.visibleLayers.push("5")
+									//t.obj.visibleLayers.push("5")
 									t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 								}	
 							})
