@@ -204,6 +204,9 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 										var field = v1.id.split("-").pop();
 										if (field.length > 0){
 											var n = t.clicks.numberWithCommas(Math.round(v[field]))
+											if (n == -1){
+												n = "Insufficient data";
+											}	
 											$(v1).html(n);
 										}	
 									})
@@ -471,6 +474,9 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 											$(v1).html(atts[field])
 										}else{
 											var n = t.clicks.numberWithCommas(Math.round(atts[field]))
+											if (n == -1){
+												n = "Insufficient data";
+											}
 											$(v1).html(n);
 										}	
 									}	

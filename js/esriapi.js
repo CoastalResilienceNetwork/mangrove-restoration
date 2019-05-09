@@ -40,7 +40,11 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 						var cs = cntry.sort();
 						var rg = region.sort();
 						$.each(cs,function(i,v){
-							$("#" + t.id + "countryOg").append("<option value='"+v+"'>"+v+"</option>")	
+							var v1 = v;
+							if (v == "Côte dIvoire"){
+								v1 = "Côte d'Ivoire";
+							}
+							$("#" + t.id + "countryOg").append("<option value='"+v+"'>"+v1+"</option>")	
 						})
 						$.each(rg,function(i,v){
 							$("#" + t.id + "regionOg").append("<option value='"+v+"'>"+v+"</option>")	
