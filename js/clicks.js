@@ -34,15 +34,18 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 				// reference layer clicks
 				$("#" + t.id + "ref-wrap input").click(function(c){
 					var ln = c.currentTarget.value;
+					var l = t.legendItems[ln];
 					if (c.currentTarget.checked){
 						t.obj.visibleLayers.push(ln);	
+						t.clicks.buildRefLegend(t, l);
 					}else{
 						var index = t.obj.visibleLayers.indexOf(ln);
 						if (index > -1){
 							t.obj.visibleLayers.splice(index, 1);
 						}
+						$(`.rl${l.layerId}`).remove();
 					}
-					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers);
 				})
 				// Stat box clicks
 				$("#" + t.id + "top-wrap .geoNum").click(function(c){
@@ -51,21 +54,70 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 					$(c.currentTarget).css("border-color","#bbb")
 					$(c.currentTarget).css("background","#ecf7fb")
 					var i;
-					for (i = 1; i < 20; i++) {
+					for (i = 1; i < 31; i++) {
 					    var index = t.obj.visibleLayers.indexOf(String(i));
 						if (index > -1){
 							t.obj.visibleLayers.splice(index, 1);
 						}
 					}
 					var lbl = $(c.currentTarget).children().eq(0).html() 
+					t.twoLayers = [];
 					$.each(t.layersArray,function(i,v){
 						if ( v.name == lbl ){
-							t.obj.visibleLayers.push(String(v.id))
+							t.twoLayers.push(String(v.id))
 						}
 					})
-					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+					t.clicks.scaleChange(t);
 				})
 			},
+			scaleChange: function(t){
+				if (t.twoLayers){
+					$.each(t.twoLayers,function(i,v){
+						var index = t.obj.visibleLayers.indexOf(v);
+						if (index > -1){
+							t.obj.visibleLayers.splice(index, 1);
+						}
+					})
+					var scale = t.map.getScale();
+					if (scale > 73957190){
+						t.obj.visibleLayers.push(t.twoLayers[0]);
+					}else{
+						t.obj.visibleLayers.push(t.twoLayers[1]);
+					}			
+					var l = t.legendItems[t.twoLayers[1]];
+					t.clicks.buildLegend(t,l);
+					t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
+				}	
+			},
+			buildLegend: function(t,l){
+				$(`#leg1`).empty();
+				$(`#leg1`).append(` <div class="legendName">${l.layerName}</div> `)
+				$.each(l.legend,function(i,v){
+					$(`#leg1`).append(`
+						<div class="legendItem">
+							<img src="data:image/png;base64,${v.imageData}" width="${v.width}" height="${v.height}" title="${v.label}">
+							<span class="liLabel">${v.label}</span>
+						</div>
+					`)	
+				})
+				if (l.layerName == "Mangrove Typology"){
+					$(`.legendItem`).css(`margin-bottom`,`0`);
+				}else{
+					$(`.legendItem`).css(`margin-bottom`,`-2px`);
+				}
+			},
+			buildRefLegend: function(t,l){
+				$(`#leg2`).append(` <div class="rl${l.layerId}" style="margin-bottom:4px;""></div> `)
+				$(`.rl${l.layerId}`).append(` <div class="legendName">${l.layerName}</div> `)
+				$.each(l.legend,function(i,v){
+					$(`.rl${l.layerId}`).append(`
+						<div class="legendItem">
+							<img src="data:image/png;base64,${v.imageData}" width="${v.width}" height="${v.height}" title="${v.label}">
+							<span class="liLabel">${v.label}</span>
+						</div>
+					`)	
+				})
+			},	
 			geographySetup: function(t){
 				// build  geography pie chart
 				var tau = 2 * Math.PI;
@@ -139,7 +191,7 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 								var index = t.obj.visibleLayers.indexOf("-1")
 								if (index > -1){
 									t.obj.visibleLayers.splice(index,1)
-									t.obj.visibleLayers.push("1")
+									//t.obj.visibleLayers.push("5")
 									t.dynamicLayer.setVisibleLayers(t.obj.visibleLayers)
 								}	
 							})
@@ -152,6 +204,9 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 										var field = v1.id.split("-").pop();
 										if (field.length > 0){
 											var n = t.clicks.numberWithCommas(Math.round(v[field]))
+											if (n == -1){
+												n = "Insufficient data";
+											}	
 											$(v1).html(n);
 										}	
 									})
@@ -419,6 +474,9 @@ function ( declare, Query, QueryTask, graphicsUtils, d3 ) {
 											$(v1).html(atts[field])
 										}else{
 											var n = t.clicks.numberWithCommas(Math.round(atts[field]))
+											if (n == -1){
+												n = "Insufficient data";
+											}
 											$(v1).html(n);
 										}	
 									}	

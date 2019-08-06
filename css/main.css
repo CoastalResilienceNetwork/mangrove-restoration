@@ -55,3 +55,36 @@
 .tick line{
 	stroke:#fff;
 }
+#legWrap{
+	max-height:350px; overflow-y:auto
+}
+#hideLeg{
+	margin:0 -5px -5px -5px; background:rgb(240,240,240);
+}
+#showLeg{
+	margin:-5px; padding:1px 4px; background:rgb(240,240,240);
+}
+#leg1{
+	margin-bottom:8px;
+}
+#leg2{
+	margin-bottom:10px;
+}
+.hsLeg{
+	text-align:center; cursor:pointer; color:#22497A; font-weight:bold;
+}
+.hsLeg:hover{
+	color:blue;
+}
+.hsLeg:active{
+	color:darkblue;
+}
+.legendName{
+	margin-bottom:3px; font-weight:bold;
+}
+.legendItem{
+	display:flex; 
+}
+.liLabel{
+	margin-left:2px;
+}

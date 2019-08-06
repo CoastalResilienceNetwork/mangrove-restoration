@@ -1,11 +1,11 @@
 define([
 	"esri/layers/ArcGISDynamicMapServiceLayer", "esri/geometry/Extent", "esri/SpatialReference", "esri/tasks/query" ,"esri/tasks/QueryTask", "dojo/_base/declare", "esri/layers/FeatureLayer", 
 	"esri/symbols/SimpleLineSymbol", "esri/symbols/SimpleFillSymbol","esri/symbols/SimpleMarkerSymbol", "esri/graphic", "dojo/_base/Color", "dojo/_base/lang",
-	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
+	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters", "esri/request"
 ],
 function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, QueryTask, declare, FeatureLayer, 
 			SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol, Graphic, Color, lang,
-			IdentifyTask, IdentifyParameters) {
+			IdentifyTask, IdentifyParameters, esriRequest) {
         "use strict";
 
         return declare(null, {
@@ -40,13 +40,32 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 						var cs = cntry.sort();
 						var rg = region.sort();
 						$.each(cs,function(i,v){
-							$("#" + t.id + "countryOg").append("<option value='"+v+"'>"+v+"</option>")	
+							var v1 = v;
+							if (v == "Côte dIvoire"){
+								v1 = "Côte d'Ivoire";
+							}
+							$("#" + t.id + "countryOg").append("<option value='"+v+"'>"+v1+"</option>")	
 						})
 						$.each(rg,function(i,v){
 							$("#" + t.id + "regionOg").append("<option value='"+v+"'>"+v+"</option>")	
 						})
 						$("#" + t.id + "chooseGeography").val("Global").trigger("chosen:updated").trigger("change");
 						//$("#show-single-plugin-mode-help").trigger("click")
+						// get legend items as json
+						var legendRequest = esriRequest({
+							url: t.url + "/legend",
+							content: { f: "json" },
+							handleAs: "json",
+							callbackParamName: "callback"
+						});
+						legendRequest.then(
+							function(response) {
+								t.legendItems = response.layers;
+								$(`#${t.id}manType`).trigger('click');
+							}, function(error) {
+								console.log("Error: ", error.message);
+							}
+						);
 					});	
 
 					$("#" + t.id + "ebOptDiv input[value='" + t.obj.ebOpt + "']").trigger("click");
@@ -69,9 +88,9 @@ function ( 	ArcGISDynamicMapServiceLayer, Extent, SpatialReference, Query, Query
 					t.map.setMapCursor("pointer")
 					$(".geoNum").css("cursor","pointer")
 				})
-				// t.map.on("extent-change",function(){
-				// 	t.map.setMapCursor("pointer");
-				// })
+				t.map.on("extent-change",function(){
+				 	t.clicks.scaleChange(t);
+				})
 			},
 			clearAtts: function(t){
 				t.map.graphics.clear();

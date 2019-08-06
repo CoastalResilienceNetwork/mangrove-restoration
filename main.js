@@ -10,7 +10,7 @@ define([
 function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, content, esriapi, clicks, lang, Query, QueryTask ) {
 	return declare(PluginBase, {
 		// The height and width are set here when an infographic is defined. When the user click Continue it rebuilds the app window with whatever you put in.
-		toolbarName:"Mangrove Restoration", showServiceLayersInLegend:true, allowIdentifyWhenActive:false, rendered:false, resizable:false,
+		toolbarName:"Mangrove Restoration", showServiceLayersInLegend:false, allowIdentifyWhenActive:false, rendered:false, resizable:false,
 		hasCustomPrint:false, size:'custom', width:"450", hasHelp:false, fullName:"Mangrove Restoration",
 		
 		// First function called when the user clicks the pluging icon. 
@@ -89,6 +89,30 @@ function ( 	declare, PluginBase, ContentPane, dom, domStyle, domGeom, obj, conte
 			var idUpdate0 = content.replace(/for="/g, 'for="' + this.id);	
 			var idUpdate = idUpdate0.replace(/id="/g, 'id="' + this.id);
 			$('#' + this.id).html(idUpdate);
+			// Add popup window for descriptions
+			this.legDiv = new ContentPane({style:'padding:5px; color:#000; opacity: 1; z-index:1000; position:absolute; bottom:50px; right:10px; border-radius:5px; box-shadow: 0 1px 2px rgba(0,0,0,0.5); background:#fff;'});
+			this.legID = this.legDiv.id;
+			dom.byId('map-0').appendChild(this.legDiv.domNode);
+			$('#' + this.legID).html(`
+					<div class="hsLeg" id="showLeg" style="display:none;">Show Legend</div>
+					<div id="legWrap">
+						<div class="legDiv" id="legendContent">
+							<div id="leg1"></div>
+							<div id="leg2"></div>
+						</div>
+					</div>
+					<div class="hsLeg" id="hideLeg">Minimize</div>
+				`);
+			$("#hideLeg").click(function(c){
+				$("#legWrap").hide();
+				$("#showLeg").show();
+				$("#hideLeg").hide();
+			})
+			$("#showLeg").click(function(c){
+				$("#showLeg").hide();
+				$("#legWrap").show();
+				$("#hideLeg").show();
+			})
 			// Click listeners
 			this.clicks.eventListeners(this);
 			this.clicks.geographySetup(this);
